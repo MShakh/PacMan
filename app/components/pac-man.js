@@ -8,6 +8,7 @@ import {
 import SharedStuff from '../mixins/shared-stuff';
 import Pac from '../models/pac';
 import Level from '../models/level';
+import Level2 from '../models/level2';
 
 
  export default Component.extend(SharedStuff, {
@@ -26,8 +27,8 @@ import Level from '../models/level';
    },
 
   didInsertElement(){
-    let level = Level.create();
-    this.set('level', Level.create());
+    let level = Level2.create();
+    this.set('level', level);
     let pac = Pac.create({level: level});
     this.set('pac', pac);
     this.loop();
@@ -91,7 +92,7 @@ import Level from '../models/level';
 
       if(level.isComplete()){
         this.incrementProperty('levelNumber');
-        this.restartLevel();
+        this.restart();
       }
     }
   },
