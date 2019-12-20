@@ -36,12 +36,20 @@ import Level2 from '../models/level2';
       y: level.get('startingPac.y')
     });
     this.set('pac', pac);
-    let ghost = Ghost.create({
+    let ghost1 = Ghost.create({
       level: level,
       x: 0,
-      y: 0
+      y: 0,
+      pac: pac
     });
-    this.set('ghost', ghost);
+    let ghost2 = Ghost.create({
+      level: level,
+      x: 5,
+      y: 0,
+      pac: pac
+    });
+    let ghosts = [ghost1, ghost2];
+    this.set('ghosts', ghosts);
     this.loop();
     bindKeyboardShortcuts(this);
   },
@@ -81,13 +89,14 @@ import Level2 from '../models/level2';
 
   loop(){
     this.get('pac').move();
+    this.get('ghosts').forEach((ghost) => ghost.move())
 
     this.processAnyPellets();
 
     this.clearScreen();
     this.drawGrid();
     this.get('pac').draw();
-    this.get('ghost').draw();
+    this.get('ghosts').forEach((ghost) => ghost.draw())
 
     later(this, this.loop, 1000/60);
   },
