@@ -13,5 +13,10 @@ export default Level.extend({
             [2, 1, 1, 2, 1, 2, 1, 1, 2],
             [2, 2, 2, 2, 2, 2, 2, 2, 2],
         ];
+
+        this.startingPac = {
+            x: 0,
+            y: 3
+        };
     }
 })

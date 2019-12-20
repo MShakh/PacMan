@@ -7,6 +7,7 @@ import {
 
 import SharedStuff from '../mixins/shared-stuff';
 import Pac from '../models/pac';
+import Ghost from '../models/ghost';
 import Level from '../models/level';
 import Level2 from '../models/level2';
 
@@ -29,8 +30,18 @@ import Level2 from '../models/level2';
   didInsertElement(){
     let level = Level2.create();
     this.set('level', level);
-    let pac = Pac.create({level: level});
+    let pac = Pac.create({
+      level: level,
+      x: level.get('startingPac.x'),
+      y: level.get('startingPac.y')
+    });
     this.set('pac', pac);
+    let ghost = Ghost.create({
+      level: level,
+      x: 0,
+      y: 0
+    });
+    this.set('ghost', ghost);
     this.loop();
     bindKeyboardShortcuts(this);
   },
@@ -76,6 +87,7 @@ import Level2 from '../models/level2';
     this.clearScreen();
     this.drawGrid();
     this.get('pac').draw();
+    this.get('ghost').draw();
 
     later(this, this.loop, 1000/60);
   },
@@ -85,7 +97,6 @@ import Level2 from '../models/level2';
     let y = this.get('pac.y');
     let grid = this.get('level.grid');
     let level = this.get('level');
-
     if(grid[y][x] == 2){
       grid[y][x] = 0;
       this.incrementProperty('score');

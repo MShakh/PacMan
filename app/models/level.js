@@ -5,18 +5,23 @@ import SharedStuff from '../mixins/shared-stuff';
 
 export default EmberObject.extend(SharedStuff, {
     init(){
-        this._super(...arguments);
+      this._super(...arguments);
 
-        this.squareSize = 40;
+      this.squareSize = 40;
 
-        this.grid = [
-            [2, 2, 2, 2, 2, 2, 2, 1],
-            [2, 1, 2, 1, 2, 2, 2, 1],
-            [2, 2, 1, 2, 2, 2, 2, 1],
-            [2, 2, 2, 2, 2, 2, 2, 1],
-            [2, 2, 2, 2, 2, 2, 2, 1],
-            [1, 2, 2, 2, 2, 2, 2, 1],
-        ];       
+      this.grid = [
+          [2, 2, 2, 2, 2, 2, 2, 1],
+          [2, 1, 2, 1, 2, 2, 2, 1],
+          [2, 2, 1, 2, 2, 2, 2, 1],
+          [2, 2, 2, 2, 2, 2, 2, 1],
+          [2, 2, 2, 2, 2, 2, 2, 1],
+          [1, 2, 2, 2, 2, 2, 2, 1],
+      ];
+      
+      this.startingPac = {
+        x: 2,
+        y: 1
+      };   
     },
  
     width: computed(function(){

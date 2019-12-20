@@ -8,8 +8,9 @@ export default EmberObject.extend(SharedStuff, {
         this.direction = 'down';
         this.intent = 'down';
 
-        this.x = 1;
-        this.y = 2;
+        this.level = this.get('level');
+        this.x = this.get('x');
+        this.y = this.get('y');
     },
 
     draw(){
@@ -68,8 +69,8 @@ export default EmberObject.extend(SharedStuff, {
     },
 
     restart(){
-        this.set('x', 0);
-        this.set('y', 0);
+        this.set('x', this.get('level.startingPac.x'));
+        this.set('y', this.get('level.startingPac.y'));
         this.set('frameCycle', 0);
         this.set('direction', 'stopped');
     }
