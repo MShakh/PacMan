@@ -10,10 +10,13 @@ export default Mixin.create({
         this.level = this.get('level');
 
         this.direction = 'down';
+        this.timers = [];
     },
     
     move(){
-        if(this.animationCompleted()){
+        if(this.get('removed')){
+
+        } else if(this.animationCompleted()){
             this.finalizeMove();
             this.changeDirection();
         } else if(this.get('direction') == 'stopped'){
@@ -21,6 +24,15 @@ export default Mixin.create({
         } else {
             this.incrementProperty('frameCycle');
         }
+        this.tickTimers();
+    },
+
+    tickTimers(){
+        this.get('timers').forEach(timerName => {
+            if(this.get(timerName) > 0){
+                this.decrementProperty(timerName);
+            }
+        })
     },
 
     animationCompleted(){
@@ -48,6 +60,19 @@ export default Mixin.create({
     },
 
     nextCoordinate(coordinate, direction){
-        return this.get(coordinate) + this.get(`directions.${direction}.${coordinate}`);
+        let next = this.get(coordinate) + this.get(`directions.${direction}.${coordinate}`);
+        if(this.get('level.teleport')){
+            if(direction == 'up' || direction == 'down'){
+                return this.modulo(next, this.get('level.height'));
+            } else {
+                return this.modulo(next, this.get('level.width'));
+            }
+        } else {
+            return next;
+        }
+    },
+
+    modulo(num, mod){
+        return ((num + mod) % mod);
     }
 }); 

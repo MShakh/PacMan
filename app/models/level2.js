@@ -18,5 +18,13 @@ export default Level.extend({
             x: 0,
             y: 3
         };
+
+        this.startingGhosts = [{
+            x: 0,
+            y: 0
+        }, {
+            x: 5,
+            y: 0
+        }];
     }
 })

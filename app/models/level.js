@@ -7,21 +7,38 @@ export default EmberObject.extend(SharedStuff, {
     init(){
       this._super(...arguments);
 
-      this.squareSize = 40;
+      this.squareSize = 60;
 
-      this.grid = [
-          [2, 2, 2, 2, 2, 2, 2, 1],
-          [2, 1, 2, 1, 2, 2, 2, 1],
-          [2, 2, 1, 2, 2, 2, 2, 1],
-          [2, 2, 2, 2, 2, 2, 2, 1],
-          [2, 2, 2, 2, 2, 2, 2, 1],
-          [1, 2, 2, 2, 2, 2, 2, 1],
+      this.layout = [
+          [1, 1, 1, 2, 1, 1, 1, 1, 1],
+          [1, 2, 2, 2, 2, 2, 2, 1, 1],
+          [1, 2, 2, 2, 2, 2, 2, 2, 1],
+          [1, 2, 2, 1, 1, 1, 2, 2, 1],
+          [1, 2, 2, 2, 2, 2, 2, 3, 1],
+          [1, 2, 1, 2, 1, 2, 1, 2, 1],
+          [1, 2, 2, 2, 2, 2, 2, 2, 1],
+          [1, 1, 1, 2, 1, 1, 1, 1, 1]
       ];
+
+      this.ghostRetreat = {
+        x: 4,
+        y: 3
+      };
       
       this.startingPac = {
         x: 2,
         y: 1
-      };   
+      };
+      
+      this.startingGhosts = [{
+        x: 6,
+        y: 6
+      }, {
+          x: 5,
+          y: 1
+      }];
+
+      this.teleport = true;
     },
  
     width: computed(function(){
@@ -55,13 +72,7 @@ export default EmberObject.extend(SharedStuff, {
     },
 
     restart(){
-        let grid = this.get('grid');
-        grid.forEach((row, rowIndex)=>{
-          row.forEach((cell, columnIndex)=>{
-            if(cell == 0){
-              grid[rowIndex][columnIndex] = 2;
-            }
-          });
-        });
+        let newGrid = Ember.copy(this.get('layout'), true);
+        this.set('grid', newGrid);
     }
 });

@@ -1,6 +1,7 @@
 import EmberObject from '@ember/object';
 import SharedStuff from '../mixins/shared-stuff';
 import Movement from '../mixins/movement';
+import { computed } from '@ember/object';
 
 export default EmberObject.extend(SharedStuff, Movement, {
     init(){
@@ -10,13 +11,39 @@ export default EmberObject.extend(SharedStuff, Movement, {
         this.level = this.get('level');
         this.x = this.get('x');
         this.y = this.get('y');
+        this.pac = this.get('pac');
+        this.removed = computed.gt('retreatTime', 0);
+        this.retreatTime = 0;
+        this.maxRetreatTime = 500;
+        this.timers = ['retreatTime'];
+
+        this.set('startingX', this.get('x'));
+        this.set('startingY', this.get('y'));
     },
 
     draw(){
         let x = this.get('x');
         let y = this.get('y');
         let radiusDivisor = 2;
-        this.drawCircle(x, y, radiusDivisor, this.get('direction'), '#F55');
+        this.drawCircle(x, y, radiusDivisor, this.get('direction'), this.get('color'));
+    },
+   
+    color: computed('retreatTime', function(){
+        let timerPercentage = this.get('retreatTime') / this.get('maxRetreatTime');
+        let retreated = {r: 0, g: 0, b: 0};
+        let normal = {r: 100, g: 40, b: 40};
+        let [r, g, b] = ['r', 'g', 'b'].map(function(rgbSelector){
+            let color = retreated[rgbSelector] * timerPercentage + normal[rgbSelector] * (1 - timerPercentage);
+            return Math.round(color);
+        });
+        return `rgb(${r}%,${g}%,${b}%)`;
+    }),
+
+    retreat(){
+        this.set('retreatTime', this.get('maxRetreatTime'));
+        this.set('frameCycle', 0);
+        this.set('x', this.get('level.ghostRetreat.x'));
+        this.set('y', this.get('level.ghostRetreat.y'));
     },
 
     changeDirection(){
@@ -33,9 +60,12 @@ export default EmberObject.extend(SharedStuff, Movement, {
         if(this.pathBlockedInDirection(direction)){
             return 0;
         } else {
-            let chances = ((this.get('pac.y') - this.get('y')) * this.get(`directions.${direction}.y`)) +
+            let desirabilityOfDirection = ((this.get('pac.y') - this.get('y')) * this.get(`directions.${direction}.y`)) +
             + ((this.get('pac.x') - this.get('x')) * this.get(`directions.${direction}.x`));
-            return Math.max(chances, 0) + 0.2;
+            if(this.get('pac.powerMode')){
+                desirabilityOfDirection *= -1;
+            }
+            return Math.max(desirabilityOfDirection, 0) + 0.2;           
         }
     },
 
@@ -55,6 +85,13 @@ export default EmberObject.extend(SharedStuff, Movement, {
                 return list[i];
             }
         }
+    },
+
+    restart(){
+        this.set('x', this.get('startingX'));
+        this.set('y', this.get('startingY'));
+        this.set('frameCycle', 0);
+        this.set('direction', 'stopped');
     }
 
 });

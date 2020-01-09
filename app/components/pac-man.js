@@ -18,6 +18,8 @@ import Level2 from '../models/level2';
 
     this.score = 0;
     this.levelNumber = 1;
+    this.lives = 3;
+    this.levels = [Level, Level2];
 
     this.keyboardShortcuts = {
       up() { this.set('pac.intent', 'up');},
@@ -28,30 +30,32 @@ import Level2 from '../models/level2';
    },
 
   didInsertElement(){
-    let level = Level2.create();
+    this.startNewLevel();
+    this.loop();
+    bindKeyboardShortcuts(this);
+  },
+
+  startNewLevel(){
+    let level = this.loadNewLevel();
+    level.restart();
     this.set('level', level);
+
     let pac = Pac.create({
       level: level,
       x: level.get('startingPac.x'),
       y: level.get('startingPac.y')
     });
     this.set('pac', pac);
-    let ghost1 = Ghost.create({
-      level: level,
-      x: 0,
-      y: 0,
-      pac: pac
+
+    let ghosts = level.get('startingGhosts').map(startingPosition => {
+      return Ghost.create({
+        level: level,
+        x: startingPosition.x,
+        y: startingPosition.y,
+        pac: pac
+      })
     });
-    let ghost2 = Ghost.create({
-      level: level,
-      x: 5,
-      y: 0,
-      pac: pac
-    });
-    let ghosts = [ghost1, ghost2];
     this.set('ghosts', ghosts);
-    this.loop();
-    bindKeyboardShortcuts(this);
   },
 
   drawWall(x, y){
@@ -70,6 +74,11 @@ import Level2 from '../models/level2';
     this.drawCircle(x, y, radiusDivisor, 'stopped');
   },
 
+  drawPowerPellet(x, y){
+    let radiusDivisor = 4;
+    this.drawCircle(x, y, radiusDivisor, 'stopped', 'green');
+  },
+
   drawGrid(){
     let grid = this.get('level.grid');
     grid.forEach((row, rowIndex) => {
@@ -78,6 +87,8 @@ import Level2 from '../models/level2';
           this.drawWall(columnIndex, rowIndex);
         if(cell == 2)
           this.drawPellet(columnIndex, rowIndex);
+        if(cell == 3)
+          this.drawPowerPellet(columnIndex, rowIndex);
       });
     });
   },
@@ -89,14 +100,24 @@ import Level2 from '../models/level2';
 
   loop(){
     this.get('pac').move();
-    this.get('ghosts').forEach((ghost) => ghost.move())
+    this.get('ghosts').forEach(ghost => ghost.move())
 
     this.processAnyPellets();
 
     this.clearScreen();
     this.drawGrid();
     this.get('pac').draw();
-    this.get('ghosts').forEach((ghost) => ghost.draw())
+    this.get('ghosts').forEach(ghost => ghost.draw())
+
+    let ghostCollisions = this.detectGhostCollisions();
+    if(ghostCollisions.length > 0){
+      if(this.get('pac.powerMode')){
+        ghostCollisions.forEach(ghost => ghost.retreat());
+      } else {
+        this.decrementProperty('lives');
+        this.restart();
+      }
+    }
 
     later(this, this.loop, 1000/60);
   },
@@ -105,21 +126,44 @@ import Level2 from '../models/level2';
     let x = this.get('pac.x');
     let y = this.get('pac.y');
     let grid = this.get('level.grid');
-    let level = this.get('level');
+
     if(grid[y][x] == 2){
       grid[y][x] = 0;
       this.incrementProperty('score');
 
-      if(level.isComplete()){
+      if(this.get('level').isComplete()){
         this.incrementProperty('levelNumber');
-        this.restart();
+        this.startNewLevel();
       }
+    } else if(grid[y][x] == 3){
+      grid[y][x] = 0;
+      this.set('pac.powerModeTime', this.get('pac.maxPowerModeTime'));
     }
   },
 
+  detectGhostCollisions(){
+    return this.get('ghosts').filter(ghost => {
+      return (this.get('pac.x') == ghost.get('x')) &&
+             (this.get('pac.y') == ghost.get('y'))
+    })
+  },
+
+  loadNewLevel(){
+    let levelIndex = (this.get('levelNumber') - 1) % this.get('levels.length');
+    let levelClass = this.get('levels')[levelIndex];
+    return levelClass.create();
+  },
+
   restart(){
+    if(this.get('lives') <= 0)
+    {
+      this.set('score', 0);
+      this.set('lives', 3);
+      this.set('levelNumber', 1);
+      this.startNewLevel();
+    }
     this.get('pac').restart();
-    this.get('level').restart();
+    this.get('ghosts').forEach( ghost => ghost.restart());
   },
 
   willDestroyElement() {
