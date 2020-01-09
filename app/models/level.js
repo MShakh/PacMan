@@ -1,5 +1,6 @@
 import EmberObject from '@ember/object';
 import { computed } from '@ember/object';
+import { copy } from '@ember/object/internals';
 
 import SharedStuff from '../mixins/shared-stuff';
 
@@ -41,7 +42,7 @@ export default EmberObject.extend(SharedStuff, {
           y: 1
       }];
 
-      this.teleport = true;
+      this.teleport = false;
     },
  
     width: computed(function(){
@@ -75,7 +76,7 @@ export default EmberObject.extend(SharedStuff, {
     },
 
     restart(){
-        let newGrid = Ember.copy(this.get('layout'), true);
+        let newGrid = copy(this.get('layout'), true);
         this.set('grid', newGrid);
     }
 });
