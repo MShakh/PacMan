@@ -4,21 +4,12 @@ import Movement from '../mixins/movement';
 import { computed } from '@ember/object';
 
 export default EmberObject.extend(SharedStuff, Movement, {
-    init(){
-        this._super(...arguments);
-        this.direction = 'down';
-        this.intent = 'down';
-
-        this.level = this.get('level');
-        this.x = this.get('x');
-        this.y = this.get('y');
-        this.pac = this.get('pac');
-
-        this.powerMode = computed.gt('powerModeTime', 0);
-        this.powerModeTime = 0;
-        this.maxPowerModeTime = 400;
-        this.timers = ['powerModeTime'];
-    },
+    direction: 'stopped',
+    intent: 'stopped',
+    timers: ['powerModeTime'],
+    maxPowerModeTime: 400,
+    powerModeTime: 0,
+    powerMode: computed.gt('powerModeTime', 0),
 
     color: computed('powerModeTime', function(){
         let timerPercentage = this.get('powerModeTime') / this.get('maxPowerModeTime');

@@ -25,6 +25,6 @@ export default Level.extend({
         }, {
             x: 5,
             y: 0
-        }];
+        }]
     }
 })

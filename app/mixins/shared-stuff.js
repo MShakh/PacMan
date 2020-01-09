@@ -2,20 +2,9 @@ import Mixin from '@ember/object/mixin';
 import { computed } from '@ember/object';
 
 export default Mixin.create({
-    init(){
-        this._super(...arguments);
-        this.frameCycle = 1;
-        this.framesPerMovement = 30;  
+    frameCycle: 1,
+    framesPerMovement: 30,
 
-        this.directions = {
-            'up': {x: 0, y: -1},
-            'down': {x: 0, y: 1},
-            'left': {x: -1, y: 0},
-            'right': {x: 1, y: 0},
-            'stopped': {x: 0, y: 0},
-        };
-    },
-    
     ctx: computed(function(){
         let canvas = document.getElementById("myCanvas");
         let ctx = canvas.getContext("2d");
@@ -39,5 +28,13 @@ export default Mixin.create({
     offsetFor(coordinate, direction){
         let frameRatio = this.get('frameCycle') / this.get('framesPerMovement');
         return this.get(`directions.${direction}.${coordinate}`) * frameRatio;
+    },
+
+    directions: {
+        'up': {x: 0, y: -1},
+        'down': {x: 0, y: 1},
+        'left': {x: -1, y: 0},
+        'right': {x: 1, y: 0},
+        'stopped': {x: 0, y: 0}
     }
 }); 

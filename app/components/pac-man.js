@@ -13,21 +13,17 @@ import Level2 from '../models/level2';
 
 
  export default Component.extend(SharedStuff, {
-   init() {
-    this._super(...arguments);
+   levels: [Level],
+   score: 0,
+   levelNumber: 1,
+   lives: 3,
 
-    this.score = 0;
-    this.levelNumber = 1;
-    this.lives = 3;
-    this.levels = [Level, Level2];
-
-    this.keyboardShortcuts = {
-      up() { this.set('pac.intent', 'up');},
-      down() { this.set('pac.intent','down');},
-      left() { this.set('pac.intent','left');},
-      right() { this.set('pac.intent','right');},
-    };
-   },
+   keyboardShortcuts: {
+    up() { this.set('pac.intent', 'up');},
+    down() { this.set('pac.intent','down');},
+    left() { this.set('pac.intent','left');},
+    right() { this.set('pac.intent','right');},
+  },
 
   didInsertElement(){
     this.startNewLevel();
@@ -83,11 +79,11 @@ import Level2 from '../models/level2';
     let grid = this.get('level.grid');
     grid.forEach((row, rowIndex) => {
       row.forEach((cell, columnIndex) => {
-        if(cell == 1)
+        if(cell == '1')
           this.drawWall(columnIndex, rowIndex);
-        if(cell == 2)
+        if(cell == '2')
           this.drawPellet(columnIndex, rowIndex);
-        if(cell == 3)
+        if(cell == '3')
           this.drawPowerPellet(columnIndex, rowIndex);
       });
     });

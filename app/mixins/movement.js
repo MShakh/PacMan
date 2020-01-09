@@ -2,16 +2,11 @@ import Mixin from '@ember/object/mixin';
 import { isEmpty } from '@ember/utils';
 
 export default Mixin.create({
-    init(){
-        this._super(...arguments);
-        
-        this.x = this.get('x');
-        this.y = this.get('y');
-        this.level = this.get('level');
-
-        this.direction = 'down';
-        this.timers = [];
-    },
+    x: null,
+    y: null,
+    level: null,
+    direction: 'stopped',
+    timers: [],
     
     move(){
         if(this.get('removed')){
